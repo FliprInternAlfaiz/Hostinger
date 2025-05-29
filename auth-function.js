@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const encrypt = require('./encrypt-function');
 const database = require('./database-function');
 
-const strict_pass = "Rxp5MUcc0sunq67eDQe7MZfQzZ3n9mLWAMWTkB3B8Ik4SWh50Gw7T18alRU0t83u";
+const strict_pass = "OGJp9DpHCcpjYgifr11pjdv6j9ANocQ7o75G8swzzvcIzILRvdXT1QLLGdzBJ8Wx";
 
 function isJson(input) {
     if (typeof input === "string") {
