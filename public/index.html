@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encryption and Decryption</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+        }
+
+        .alert {
+            margin-top: 10px;
+        }
+
+        /* Custom Primary Color */
+        .btn-primary {
+            background-color: #5E17EB;
+            border-color: #5E17EB;
+        }
+
+        .btn-primary:hover {
+            background-color: #4b0db4;
+            border-color: #4b0db4;
+        }
+
+        .btn-primary:focus,
+        .btn-primary.focus {
+            box-shadow: 0 0 0 0.2rem rgba(93, 18, 235, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center">Encryption and Decryption</h1>
+        <h1 class="text-center">--~--</h1>
+
+        <div class="alert alert-primary" role="alert" id="message"></div>
+
+        <div class="mb-4">
+            <h3>Encrypt Data</h3>
+            <form id="encryptForm">
+                <div class="form-group">
+                    <label for="encryptPass">Password:</label>
+                    <input type="text" class="form-control" id="encryptPass" required>
+                </div>
+                <div class="form-group">
+                    <label for="encryptValue">Data to Encrypt:</label>
+                    <textarea class="form-control" id="encryptValue" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Encrypt</button>
+            </form>
+            <h4 class="mt-4">Encrypted Data:</h4>
+            <pre id="encryptedData" class="border p-3 bg-light"></pre>
+        </div>
+
+        <div class="mb-4">
+            <h3>Decrypt Data</h3>
+            <form id="decryptForm">
+                <div class="form-group">
+                    <label for="decryptPass">Password:</label>
+                    <input type="text" class="form-control" id="decryptPass" required>
+                </div>
+                <div class="form-group">
+                    <label for="decryptValue">Data to Decrypt:</label>
+                    <textarea class="form-control" id="decryptValue" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Decrypt</button>
+            </form>
+            <h4 class="mt-4">Decrypted Data:</h4>
+            <pre id="decryptedData" class="border p-3 bg-light"></pre>
+        </div>
+
+        <div class="mb-4">
+            <h3>Encrypt JSON</h3>
+            <form id="encryptJsonForm">
+                <div class="form-group">
+                    <label for="jsonValue">JSON Array:</label>
+                    <textarea class="form-control" id="jsonValue" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Encrypt JSON</button>
+            </form>
+            <h4 class="mt-4">Encrypted JSON:</h4>
+            <pre id="encryptedJson" class="border p-3 bg-light"></pre>
+        </div>
+
+        <div class="mb-4">
+            <h3>Decrypt JSON</h3>
+            <form id="decryptJsonForm">
+                <div class="form-group">
+                    <label for="jsonEncryptedValue">Encrypted JSON:</label>
+                    <textarea class="form-control" id="jsonEncryptedValue" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Decrypt JSON</button>
+            </form>
+            <h4 class="mt-4">Decrypted JSON:</h4>
+            <pre id="decryptedJsonResult" class="border p-3 bg-light"></pre>
+        </div>
+    </div>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#encryptForm').on('submit', function (event) {
+                event.preventDefault();
+                const password = $('#encryptPass').val();
+                const value = $('#encryptValue').val();
+
+                $.ajax({
+                    url: '/encrypt',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ pass: password, value: value }),
+                    success: function (response) {
+                        if (response.status) {
+                            $('#encryptedData').text(response.result);
+                            $('#message').removeClass('alert-danger').addClass('alert-success').text('Encryption successful.');
+                        } else {
+                            $('#message').removeClass('alert-success').addClass('alert-danger').text(response.msg);
+                        }
+                    },
+                    error: function () {
+                        $('#message').removeClass('alert-success').addClass('alert-danger').text('Encryption failed.');
+                    }
+                });
+            });
+
+            $('#decryptForm').on('submit', function (event) {
+                event.preventDefault();
+                const password = $('#decryptPass').val();
+                const value = $('#decryptValue').val();
+
+                $.ajax({
+                    url: '/decrypt',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ pass: password, value: value }),
+                    success: function (response) {
+                        if (response.status) {
+                            $('#decryptedData').text(response.result);
+                            $('#message').removeClass('alert-danger').addClass('alert-success').text('Decryption successful.');
+                        } else {
+                            $('#message').removeClass('alert-success').addClass('alert-danger').text(response.msg);
+                        }
+                    },
+                    error: function () {
+                        $('#message').removeClass('alert-success').addClass('alert-danger').text('Decryption failed.');
+                    }
+                });
+            });
+
+            $('#encryptJsonForm').on('submit', function (event) {
+                event.preventDefault();
+                const value = $('#jsonValue').val();
+
+                try {
+                    $.ajax({
+                        url: '/encrypt-json',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ value: value }),
+                        success: function (response) {
+                            if (response.status) {
+                                $('#encryptedJson').text(response.result);
+                                $('#message').removeClass('alert-danger').addClass('alert-success').text('JSON encryption successful.');
+                            } else {
+                                $('#message').removeClass('alert-success').addClass('alert-danger').text(response.msg);
+                            }
+                        },
+                        error: function () {
+                            $('#message').removeClass('alert-success').addClass('alert-danger').text('JSON encryption failed.');
+                        }
+                    });
+                } catch (error) {
+                    $('#message').removeClass('alert-success').addClass('alert-danger').text('Invalid JSON format.');
+                }
+            });
+
+            $('#decryptJsonForm').on('submit', function (event) {
+                event.preventDefault();
+                const value = $('#jsonEncryptedValue').val();
+
+                $.ajax({
+                    url: '/decrypt-json',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ value: value }),
+                    success: function (response) {
+                        if (response.status) {
+                            $('#decryptedJsonResult').text(JSON.stringify(response.result, null, 2));
+                            $('#message').removeClass('alert-danger').addClass('alert-success').text('JSON decryption successful.');
+                        } else {
+                            $('#message').removeClass('alert-success').addClass('alert-danger').text(response.msg);
+                        }
+                    },
+                    error: function () {
+                        $('#message').removeClass('alert-success').addClass('alert-danger').text('JSON decryption failed.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
